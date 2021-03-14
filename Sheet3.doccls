@@ -1,0 +1,28 @@
+﻿Private Sub Worksheet_Change(ByVal Target As Range)
+    Dim KeyCells As Range
+    Dim part_number As String
+    Dim filePath As String
+
+    ' The variable KeyCells contains the cells that will
+    ' cause an alert when they are changed.
+    Set KeyCells = Cells(5, 2)
+    'Set KeyCells = Range("B5")
+    part_number = Cells(5, 2)
+    filePath = "C:\Users\" & Environ("username") & "\Dropbox (BCA_TECH)\Kabatech Program\Input Sheets\" & part_number
+
+    If Not importFlag Then
+        If Not Application.Intersect(KeyCells, Range(Target.Address)) Is Nothing Then
+            'MsgBox "exists"
+            If Test_File_Exist_With_Dir(filePath) Then
+                answer = MsgBox("This part number already exists - " & part_number & ". Would you like to import it?", vbYesNo + vbQuestion, "Part Exists")
+                If answer = 6 Then
+                    answer = MsgBox("This will overwrite the current sheet! Continue?", vbYesNo + vbwarning, "Overwrite?")
+                    If answer = 6 Then
+                        'import the sheet
+                        Call Import_Text_To_Spreadsheet(, part_number)
+                    End If
+                End If
+            End If
+        End If
+    End If
+End Sub
