@@ -10,15 +10,15 @@ Attribute VB_Exposed = False
 Private colBranches As New Collection
 
 Public Function Add(objBranch As clsbranch)
-   Call colBranches.Add(item:=objBranch, Key:=objBranch.branchNr)
+   Call colBranches.Add(Item:=objBranch, Key:=objBranch.branchNr)
 End Function
 
 Public Sub Remove(vItem As Variant)
    colBranches.Remove vItem
 End Sub
 
-Public Property Get item(vItem As Variant) As clsbranch
-   Set item = colBranches(vItem)
+Public Property Get Item(vItem As Variant) As clsbranch
+   Set Item = colBranches(vItem)
 End Property
 
 Public Property Get Count() As Long

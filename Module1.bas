@@ -41,7 +41,7 @@ Public TallyLength As Long
 Public length As Long
 Public position As Long
 Public ProgramNum As String
-Public fileName As String
+Public filename As String
 Public importFlag As Boolean 'Used to check if its ok to check the part number (not ok when importing and clearing input sheet)
 
 
@@ -586,12 +586,12 @@ Attribute Import_CLC_To_Excel.VB_ProcData.VB_Invoke_Func = "O\n14"
     Range("a6").Value = 0
     Dim StrFind As String
     Dim LastRow As Long
-    Dim fileName As Variant
+    Dim filename As Variant
     Dim iCount As Long
     ChDrive ("U:\\")
     ChDir ("U:\Tech\C16Programs")
-    fileName = Application.GetOpenFilename(filefilter:="Text File (*.clc),(*.clc")
-    If fileName = False Then
+    filename = Application.GetOpenFilename(filefilter:="Text File (*.clc),(*.clc")
+    If filename = False Then
         Exit Sub
     End If
 
@@ -603,7 +603,7 @@ Attribute Import_CLC_To_Excel.VB_ProcData.VB_Invoke_Func = "O\n14"
 
     Range("A6").Select
     With Sheets(ProgramSheet).QueryTables.Add( _
-        Connection:="TEXT;" & fileName, _
+        Connection:="TEXT;" & filename, _
         Destination:=Range("A6"))
         
         .Name = "TEST"
@@ -643,15 +643,15 @@ Attribute Import_CLC_To_Excel.VB_ProcData.VB_Invoke_Func = "O\n14"
 
             iCount = iCount + 1
 
-            StrFind = Right$(fileName, iCount)
+            StrFind = Right$(filename, iCount)
 
-            If iCount = Len(fileName) Then Exit Do
+            If iCount = Len(filename) Then Exit Do
 
         Loop
 
         Range("B1").Value = Right$(StrFind, Len(StrFind) - 1)
         Sheets(ProgramSheet).Range("b2").ClearContents ' note that this row expects the worksheet to be named DATA
-        Sheets(ProgramSheet).Hyperlinks.Add Range("b2"), fileName
+        Sheets(ProgramSheet).Hyperlinks.Add Range("b2"), filename
 
 End Sub
 
@@ -842,7 +842,7 @@ End Sub
 
 Sub Write_Dropout(Optional IRibbonControl)
     If Selection.Cells.Count = 1 Then
-        If ActiveCell.Column = 2 And ActiveCell.Row > 10 Then
+        If ActiveCell.Column = 2 And ActiveCell.Row > StartRow - 1 Then
             Selection.Value = DP
         Else
             MsgBox "Can only write in the description cell"
@@ -854,7 +854,7 @@ End Sub
 
 Sub Write_Measure_By_Hand(Optional IRibbonControl)
     If Selection.Cells.Count = 1 Then
-        If ActiveCell.Column = 2 And ActiveCell.Row > 10 Then
+        If ActiveCell.Column = 2 And ActiveCell.Row > StartRow - 1 Then
             Selection.Value = MBH
         Else
             MsgBox "Can only write in the description cell"
@@ -1079,8 +1079,8 @@ Sub Set_Up_Word_Doc(wordapp As Word.Application, objSelection As Selection, objd
     ' *** Read all the program info and validate the input ***
     program.Customer = UCase$(Cells(1, 2)) 'read in customer in uppercase
     If program.Customer <> vbNullString Then
-        If Len(program.Customer) > 20 Then
-            MsgBox "Customer name is too long, should be 20 characters max."
+        If Len(program.Customer) > 25 Then
+            MsgBox "Customer name is too long, should be 25 characters max."
             End
         End If
     Else
@@ -1091,8 +1091,8 @@ Sub Set_Up_Word_Doc(wordapp As Word.Application, objSelection As Selection, objd
     End If
     program.Range = UCase$(Cells(2, 2)) 'read in range in uppercase
     If program.Range <> vbNullString Then
-        If Len(program.Range) > 15 Then
-            MsgBox "Range is too long, should be 15 characters max."
+        If Len(program.Range) > 20 Then
+            MsgBox "Range is too long, should be 20 characters max."
             End
         End If
     Else
@@ -1103,8 +1103,8 @@ Sub Set_Up_Word_Doc(wordapp As Word.Application, objSelection As Selection, objd
     End If
     program.Model = UCase$(Cells(3, 2)) 'read in model in uppercase
     If program.Model <> vbNullString Then
-        If Len(program.Model) > 10 Then
-            MsgBox "Model is too long, should be 10 characters max."
+        If Len(program.Model) > 20 Then
+            MsgBox "Model is too long, should be 20 characters max."
             End
         End If
     Else
@@ -1115,8 +1115,8 @@ Sub Set_Up_Word_Doc(wordapp As Word.Application, objSelection As Selection, objd
     End If
     program.Location = UCase$(Cells(4, 2)) 'read in location in uppercase
     If program.Location <> vbNullString Then
-        If Len(program.Location) > 15 Then
-            MsgBox "Location is too long, should be 15 characters max."
+        If Len(program.Location) > 20 Then
+            MsgBox "Location is too long, should be 20 characters max."
             End
         End If
     Else
@@ -1139,8 +1139,8 @@ Sub Set_Up_Word_Doc(wordapp As Word.Application, objSelection As Selection, objd
 '    End If
     program.Part_no = UCase$(Cells(5, 2)) 'read in part_no in uppercase
     If program.Part_no <> vbNullString Then
-        If Len(program.Part_no) > 14 Then
-            MsgBox "Part number is too long, should be 14 characters max."
+        If Len(program.Part_no) > 20 Then
+            MsgBox "Part number is too long, should be 20 characters max."
             End
         End If
     Else
@@ -1183,9 +1183,9 @@ Sub Set_Up_Word_Doc(wordapp As Word.Application, objSelection As Selection, objd
     If TestStr <> vbNullString Then 'if true then file already exists
         Dim NewFPath As String
         NewFPath = "C:\Users\" & Environ("username") & "\Dropbox (BCA_TECH)\Kabatech Program\Input Sheets\" & "Archive\" & program.Part_no & "\"
-        Dim fso As Object
-        Set fso = CreateObject("scripting.filesystemobject")
-        If fso.FolderExists(NewFPath) = False Then
+        Dim FSO As Object
+        Set FSO = CreateObject("scripting.filesystemobject")
+        If FSO.FolderExists(NewFPath) = False Then
             MkDir (NewFPath)
         End If
 
@@ -1318,10 +1318,10 @@ Sub create_log_file(ByRef program As clsProgram)
     SecondFP = "U:\James.B\C16 Program\Log Files\" & "Log File - " & program.Program_no & " rev-" & program.Revision & " " & StrNm & ".txt" 'WORKPath
     'filePath = "C:\Users\James\Dropbox (BCA_TECH)\James\Excel Programs\C16 Program James\Example File Structure\Log Files\" & "Log File - " & program.Program_no & " rev-" & program.Revision & " " & StrNm & ".txt" 'HOMEPATH
     'SecondFP = "C:\Users\James\Dropbox (BCA_TECH)\James\Excel Programs\C16 Program James\Logs\" & "Log File - " & program.Program_no & " rev-" & program.Revision & " " & StrNm & ".txt" 'HomePath
-    Dim fso As FileSystemObject
-    Set fso = New FileSystemObject
+    Dim FSO As FileSystemObject
+    Set FSO = New FileSystemObject
     Dim fileStream As TextStream
-    Set fileStream = fso.CreateTextFile(filePath)
+    Set fileStream = FSO.CreateTextFile(filePath)
     fileStream.WriteLine "Log File Created - " & Format(Now(), """Date -"" DD-MM-YYYY  ""Time -"" hh:mm:ss") 'DATE AND TIME
     fileStream.WriteLine "Application User - " & Application.userName '& program.Drawer 'Application user and release intials
     fileStream.WriteLine "Program Number = " & program.Program_no
@@ -1331,7 +1331,7 @@ Sub create_log_file(ByRef program As clsProgram)
     fileStream.WriteLine vbNewLine & "Input Sheet:" & vbNewLine & "Time and date saved - " & program.InputSheetSaved & vbNewLine & "Overwritten - " & program.InputSheetOverwritten 'input sheet log
     fileStream.Close
     SetAttr filePath, vbReadOnly 'set the file as read only
-    fso.CopyFile filePath, SecondFP
+    FSO.CopyFile filePath, SecondFP
 End Sub
 
 Sub Run(Optional control As IRibbonControl)
@@ -1371,7 +1371,11 @@ Sub Run(Optional control As IRibbonControl)
         Clear_Cells_of_Formatting_Program 'clear the program sheet
         Dim first As Boolean
         Dim i As Long
+        Dim firstFlag As Boolean
+        firstFlag = True
+        
         For i = 0 To (numBranches - 1)
+        
             If branches(i).getDescription <> MBH And branches(i).getDescription <> DP And branches(i).getCurrentPos = False Then
                 If branches(i).getPreviousPos > 0 Then
                     position = branches(i - branches(i).getPreviousPos).getLength - NewLengthAdjustment 'minus length adjusment from position length of the previous branch
@@ -1381,12 +1385,17 @@ Sub Run(Optional control As IRibbonControl)
                     On Error Resume Next
                     'Write to excel program
                     If branches(i).getInstruction = False Then 'if its not an instruction (just buildsheet)
-                        If i = 0 And i = numBranches - 1 Then 'its the first and last branch
+                        If branches(i).getPreviousPos > 0 And i = numBranches - 1 And firstFlag Then  'its the first and last branch but had previous pos
+                            write_branch_to_program branches(i), 5, program
+                            firstFlag = False
+                        ElseIf i = 0 And i = numBranches - 1 Or firstFlag = True And i = numBranches - 1 Then  'its the first and last branch
                             write_branch_to_program branches(i), 4, program
+                            firstFlag = False
                         ElseIf i > 0 And i < numBranches - 1 And first = True Then 'not first or last branch
                             write_branch_to_program branches(i), 1, program
                         ElseIf i = 0 Or first = False Then 'first branch
                             write_branch_to_program branches(i), 0, program
+                            firstFlag = False
                             first = True
                         ElseIf i = numBranches - 1 Then 'The last branch
                             'If branches(i - 2).currentPos = True Then
@@ -1401,6 +1410,7 @@ Sub Run(Optional control As IRibbonControl)
                             End If
                         End If
                     End If
+                    'firstFlag = False
             End If
             'Write to word document buildsheet
             If i = 0 And i = numBranches - 1 Then 'first and last branch
@@ -1589,7 +1599,7 @@ Function Read_Branches_From_Input_Sheet(numBranches As Long, ByRef program As cl
                 b(Count).setBlueTape (-1) 'if empty
             End If
             x = 6 'position length
-            If UCase$(Cells(i, x)) = "Y" Or b(Count).getLength = MinKabatecLength And b(Count).getDescription <> MBH And b(Count).getDescription <> DP Then 'position also if length is the minimum
+            If UCase$(Cells(i, x)) = "Y" Or b(Count).getLength = MinKabatecLength And b(Count).getDescription <> MBH And b(Count).getDescription <> DP And b(Count).getTapedLength = False Then 'position also if length is the minimum
                 b(Count).setCurrentPos (True)
                 If Count = numBranches Then 'if its the last branch
                     'Last branch cannot be a position
@@ -1695,12 +1705,26 @@ Sub write_branch_to_program(b As clsbranch, firstLastCheck As Long, ByRef progra
     ElseIf firstLastCheck = 3 Then 'last branch but previous position
         lengthToRemove = b.getLength - program.Final_branch_tape_length
         length = b.getLength - 100 + NewLengthAdjustment - lengthToRemove 'take 100 off the last length
-    ElseIf firstLastCheck = 4 Then
+    ElseIf firstLastCheck = 4 Then 'if its the first and last branch but had a previous pos, mbh, dropout
         lengthToRemove = b.getLength - program.Final_branch_tape_length
         length = b.getLength - lengthToRemove 'take 100 off the last length
-        Call b.setTapedLength(True)
+        'Call b.setTapedLength(True)
+        If b.getFullyTaped = True Then 'if its fully taped
+            Insert_Initial_Spur_Fully_Taped 'Run intial spur code
+        Else 'if its spaced taped
+            Insert_Initial_Spur_Space_Taped
+        End If
+    ElseIf firstLastCheck = 5 Then 'if its the first and last branch
+        lengthToRemove = b.getLength - program.Final_branch_tape_length
+        length = b.getLength - lengthToRemove + NewLengthAdjustment 'take 100 off the last length
+        'Call b.setTapedLength(True)
+        If b.getFullyTaped = True Then 'if its fully taped
+            Insert_Initial_Spur_Fully_Taped 'Run intial spur code
+        Else 'if its spaced taped
+            Insert_Initial_Spur_Space_Taped
+        End If
     End If
-    If firstLastCheck > 0 And firstLastCheck < 5 And length <> 0 Then 'if its a normal branch
+    If firstLastCheck > 0 And firstLastCheck < 4 And length <> 0 Then 'if its a normal branch
         If b.getFullyTaped = True Then 'if its fully taped
             If b.getTapedLength = True Then 'Taped length or branch
                 Insert_Taped_Length , b.getBlueTape 'run fully taped length code
@@ -1729,13 +1753,15 @@ Sub write_branch_to_word(b As clsbranch, objSelection As Selection)
     If b.getWirecode <> vbNullString Then 'loop through a branches wirecodes and write each char one at a time until the tabstop
         Dim i As Long
         For i = 1 To Len(b.getWirecode)
-            If (i Mod 20) = 0 Then 'if its the same pos as the tabstop do this
+            If (i Mod 17) = 0 Then 'if its the same pos as the tabstop do this (PREVIOUSLY 20)
                 Do While Mid$(b.getWirecode, i - 1, 1) <> "." And i <> Len(b.getWirecode) + 1 'print out the remaining wirecode before starting a new line
                     objSelection.TypeText (Mid$(b.getWirecode, i, 1))
                     i = i + 1
                 Loop
                 If i < Len(b.getWirecode) Then
                     objSelection.TypeText (Chr$(11) + Chr$(9))
+                'Else
+                '    objSelection.TypeText (Chr$(11) + Chr$(9))
                 End If
             End If
             If b.getWirecodeChange Then
@@ -2095,7 +2121,7 @@ Sub test()
     branches.Add b1
     branches.Add b2
     Dim b3 As New clsbranch
-    b3 = branches.item(2)
+    b3 = branches.Item(2)
     b3 = b1
 End Sub
 

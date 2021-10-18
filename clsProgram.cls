@@ -37,8 +37,8 @@ Public Sub Remove(vItem As Variant)
    m_branch.Remove vItem
 End Sub
 
-Public Property Get item(vItem As Variant) As clsbranch
-   Set item = m_branch(vItem)
+Public Property Get Item(vItem As Variant) As clsbranch
+   Set Item = m_branch(vItem)
 End Property
 
 Public Property Get Count() As Long
